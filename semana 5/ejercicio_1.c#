@@ -1,0 +1,29 @@
+using System;
+using System.Collections.Generic;
+
+class Curso
+{
+    public List<string> Asignaturas { get; set; }
+
+    public Curso()
+    {
+        Asignaturas = new List<string>();
+    }
+
+    public void Mostrar()
+    {
+        Console.WriteLine("Asignaturas del curso:");
+        foreach (var asignatura in Asignaturas)
+            Console.WriteLine(asignatura);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Curso curso = new Curso();
+        curso.Asignaturas.AddRange(new List<string> { "Literatura", "Filosofia", "Programación", "Diseño Web", "Sistemas" });
+        curso.Mostrar();
+    }
+}
