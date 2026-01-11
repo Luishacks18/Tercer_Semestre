@@ -1,0 +1,41 @@
+using System;
+using System.Collections.Generic;
+
+class CursoNotas
+{
+    public List<string> Asignaturas { get; set; }
+    public List<double> Notas { get; set; }
+
+    public CursoNotas()
+    {
+        Asignaturas = new List<string>();
+        Notas = new List<double>();
+    }
+
+    public void PedirNotas()
+    {
+        for (int i = 0; i < Asignaturas.Count; i++)
+        {
+            Console.Write($"Ingrese nota para {Asignaturas[i]}: ");
+            double nota = Convert.ToDouble(Console.ReadLine());
+            Notas.Add(nota);
+        }
+    }
+
+    public void MostrarNotas()
+    {
+        for (int i = 0; i < Asignaturas.Count; i++)
+            Console.WriteLine($"En {Asignaturas[i]} has sacado {Notas[i]}");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        CursoNotas curso = new CursoNotas();
+        curso.Asignaturas.AddRange(new List<string> { "Matemáticas", "Física", "Química", "Historia", "Lengua" });
+        curso.PedirNotas();
+        curso.MostrarNotas();
+    }
+}
