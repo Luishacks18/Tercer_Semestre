@@ -1,0 +1,29 @@
+using System;
+using System.Collections.Generic;
+
+class Numeros
+{
+    public List<int> Lista { get; set; }
+
+    public Numeros()
+    {
+        Lista = new List<int>();
+        for (int i = 9; i <= 23; i++)
+            Lista.Add(i);
+    }
+
+    public void MostrarInvertida()
+    {
+        Lista.Reverse();
+        Console.WriteLine(string.Join(", ", Lista));
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Numeros numeros = new Numeros();
+        numeros.MostrarInvertida();
+    }
+}
