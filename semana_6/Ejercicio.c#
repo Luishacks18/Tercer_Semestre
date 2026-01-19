@@ -1,0 +1,91 @@
+using System;
+
+class Nodo
+{
+    public int Dato;
+    public Nodo Siguiente;
+
+    public Nodo(int dato)
+    {
+        Dato = dato;
+        Siguiente = null;
+    }
+}
+
+class ListaEnlazada
+{
+    private Nodo cabeza;
+
+    public void Insertar(int dato)
+    {
+        Nodo nuevo = new Nodo(dato);
+
+        if (cabeza == null)
+        {
+            cabeza = nuevo;
+        }
+        else
+        {
+            Nodo actual = cabeza;
+            while (actual.Siguiente != null)
+                actual = actual.Siguiente;
+
+            actual.Siguiente = nuevo;
+        }
+    }
+
+    // EJERCICIO 3: Buscar dato y contar ocurrencias
+    public int Buscar(int valor)
+    {
+        int contador = 0;
+        Nodo actual = cabeza;
+
+        while (actual != null)
+        {
+            if (actual.Dato == valor)
+                contador++;
+
+            actual = actual.Siguiente;
+        }
+
+        if (contador == 0)
+            Console.WriteLine("El dato no fue encontrado.");
+
+        return contador;
+    }
+
+    public void Mostrar()
+    {
+        Nodo actual = cabeza;
+        while (actual != null)
+        {
+            Console.Write(actual.Dato + " -> ");
+            actual = actual.Siguiente;
+        }
+        Console.WriteLine("null");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        ListaEnlazada lista = new ListaEnlazada();
+
+        lista.Insertar(5);
+        lista.Insertar(10);
+        lista.Insertar(5);
+        lista.Insertar(20);
+        lista.Insertar(5);
+
+        lista.Mostrar();
+
+        Console.Write("Ingrese el valor a buscar: ");
+        int valor = int.Parse(Console.ReadLine());
+
+        int veces = lista.Buscar(valor);
+        Console.WriteLine("El dato aparece " + veces + " veces.");
+
+        Console.ReadLine();
+    }
+}
