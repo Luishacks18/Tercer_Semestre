@@ -1,0 +1,44 @@
+using System;
+using System.Collections.Generic;
+
+public class ParenthesesBalancer
+{
+    public static bool AreParenthesesBalanced(string expression)
+    {
+        Stack<char> stack = new Stack<char>();
+
+        foreach (char c in expression)
+        {
+            if (c == '(' || c == '[' || c == '{')
+            {
+                stack.Push(c);
+            }
+            else if (c == ')')
+            {
+                if (stack.Count == 0 || stack.Pop() != '(')
+                    return false;
+            }
+            else if (c == ']')
+            {
+                if (stack.Count == 0 || stack.Pop() != '[')
+                    return false;
+            }
+            else if (c == '}')
+            {
+                if (stack.Count == 0 || stack.Pop() != '{')
+                    return false;
+            }
+        }
+
+        return stack.Count == 0;
+    }
+
+    static void Main(string[] args)
+    {
+        string expression = "{7 + (8 * 5) - [(9 - 7) + (4 + 1)]}";
+        if (AreParenthesesBalanced(expression))
+            Console.WriteLine("Fórmula balanceada.");
+        else
+            Console.WriteLine("Fórmula no balanceada.");
+    }
+}
