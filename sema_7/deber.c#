@@ -1,0 +1,34 @@
+using System;
+using System.Collections.Generic;
+
+public class TowersOfHanoi
+{
+    public static void MoveDisks(int n, Stack<int> source, Stack<int> auxiliary, Stack<int> destination)
+    {
+        if (n == 1)
+        {
+            destination.Push(source.Pop());
+            Console.WriteLine($"Mover disco de la torre {source.GetType().Name} a la torre {destination.GetType().Name}");
+        }
+        else
+        {
+            MoveDisks(n - 1, source, destination, auxiliary);
+            destination.Push(source.Pop());
+            Console.WriteLine($"Mover disco de la torre {source.GetType().Name} a la torre {destination.GetType().Name}");
+            MoveDisks(n - 1, auxiliary, source, destination);
+        }
+    }
+
+    static void Main(string[] args)
+    {
+        int n = 3;
+        Stack<int> source = new Stack<int>();
+        Stack<int> auxiliary = new Stack<int>();
+        Stack<int> destination = new Stack<int>();
+
+        for (int i = n; i > 0; i--)
+            source.Push(i);
+
+        MoveDisks(n, source, auxiliary, destination);
+    }
+}
