@@ -1,0 +1,228 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace BrowserBackButton
+{
+    // Representa una visita (página) en el navegador simulado
+    public class PageVisit
+    {
+        public string Title { get; }
+        public string Url { get; }
+        public DateTime VisitedAt { get; }
+
+        public PageVisit(string title, string url)
+        {
+            Title = title.Trim();
+            Url = url.Trim();
+            VisitedAt = DateTime.Now;
+        }
+
+        public override string ToString()
+            => $"{Title} | {Url} | {VisitedAt:yyyy-MM-dd HH:mm:ss}";
+    }
+
+    // Navegador simulado: usa dos pilas para retroceder/avanzar
+    public class Browser
+    {
+        private readonly Stack<PageVisit> _backStack = new Stack<PageVisit>();
+        private readonly Stack<PageVisit> _forwardStack = new Stack<PageVisit>();
+
+        public PageVisit? Current { get; private set; }
+
+        public bool CanGoBack => _backStack.Count > 0;
+        public bool CanGoForward => _forwardStack.Count > 0;
+
+        public (long elapsedTicks, string message) Visit(string title, string url)
+        {
+            var sw = Stopwatch.StartNew();
+
+            var newPage = new PageVisit(title, url);
+
+            if (Current != null)
+                _backStack.Push(Current);
+
+            _forwardStack.Clear();
+
+            Current = newPage;
+
+            sw.Stop();
+            return (sw.ElapsedTicks, $" Visitaste: {Current}");
+        }
+
+        public (long elapsedTicks, string message) Back()
+        {
+            var sw = Stopwatch.StartNew();
+
+            if (!CanGoBack)
+            {
+                sw.Stop();
+                return (sw.ElapsedTicks, " No hay páginas para retroceder.");
+            }
+
+            if (Current != null)
+                _forwardStack.Push(Current);
+
+            Current = _backStack.Pop();
+
+            sw.Stop();
+            return (sw.ElapsedTicks, $"Retrocediste a: {Current}");
+        }
+
+        public (long elapsedTicks, string message) Forward()
+        {
+            var sw = Stopwatch.StartNew();
+
+            if (!CanGoForward)
+            {
+                sw.Stop();
+                return (sw.ElapsedTicks, " No hay páginas para avanzar.");
+            }
+
+            if (Current != null)
+                _backStack.Push(Current);
+
+            Current = _forwardStack.Pop();
+
+            sw.Stop();
+            return (sw.ElapsedTicks, $"Avanzaste a: {Current}");
+        }
+
+        // Reportería: visualiza elementos de las estructuras
+        public (long elapsedTicks, string report) Report()
+        {
+            var sw = Stopwatch.StartNew();
+
+            var report = new System.Text.StringBuilder();
+
+            report.AppendLine("===== REPORTE DEL NAVEGADOR =====");
+            report.AppendLine($"Página actual: {(Current == null ? "(vacío)" : Current.ToString())}");
+            report.AppendLine($"BackStack (para Atrás): {_backStack.Count} elemento(s)");
+            report.AppendLine($"ForwardStack (para Adelante): {_forwardStack.Count} elemento(s)");
+            report.AppendLine("---------------------------------");
+
+            report.AppendLine("Historial hacia ATRÁS (tope -> fondo):");
+            if (_backStack.Count == 0)
+                report.AppendLine("  (vacío)");
+            else
+            {
+                foreach (var page in _backStack)
+                    report.AppendLine($"  - {page}");
+            }
+
+            report.AppendLine("---------------------------------");
+            report.AppendLine("Historial hacia ADELANTE (tope -> fondo):");
+            if (_forwardStack.Count == 0)
+                report.AppendLine("  (vacío)");
+            else
+            {
+                foreach (var page in _forwardStack)
+                    report.AppendLine($"  - {page}");
+            }
+
+            sw.Stop();
+            return (sw.ElapsedTicks, report.ToString());
+        }
+    }
+
+    internal class Program
+    {
+        private static void Main()
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            var browser = new Browser();
+
+            while (true)
+            {
+                PrintMenu(browser);
+
+                Console.Write("Elige una opción: ");
+                var option = Console.ReadLine()?.Trim();
+
+                Console.WriteLine();
+
+                switch (option)
+                {
+                    case "1":
+                        HandleVisit(browser);
+                        break;
+
+                    case "2":
+                        HandleTimedAction("Atrás", browser.Back);
+                        break;
+
+                    case "3":
+                        HandleTimedAction("Adelante", browser.Forward);
+                        break;
+
+                    case "4":
+                        HandleReport(browser);
+                        break;
+
+                    case "0":
+                        Console.WriteLine("Saliendo... ");
+                        return;
+
+                    default:
+                        Console.WriteLine("Opción inválida. Intenta otra vez.");
+                        break;
+                }
+
+                Console.WriteLine("\nPresiona ENTER para continuar...");
+                Console.ReadLine();
+                Console.Clear();
+            }
+        }
+
+        private static void PrintMenu(Browser browser)
+        {
+            Console.WriteLine("====================================");
+            Console.WriteLine("   NAVEGADOR SIMULADO (Back Button) ");
+            Console.WriteLine("====================================");
+            Console.WriteLine($"Página actual: {(browser.Current == null ? "(vacío)" : browser.Current.Title)}");
+            Console.WriteLine($"¿Puede Atrás? {browser.CanGoBack} | ¿Puede Adelante? {browser.CanGoForward}");
+            Console.WriteLine("------------------------------------");
+            Console.WriteLine("1) Visitar nueva página");
+            Console.WriteLine("2) Atrás");
+            Console.WriteLine("3) Adelante");
+            Console.WriteLine("4) Reportería (ver pilas)");
+            Console.WriteLine("0) Salir");
+            Console.WriteLine("------------------------------------");
+        }
+
+        private static void HandleVisit(Browser browser)
+        {
+            Console.Write("Título de la página: ");
+            var title = Console.ReadLine() ?? "";
+
+            Console.Write("URL: ");
+            var url = Console.ReadLine() ?? "";
+
+            if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(url))
+            {
+                Console.WriteLine(" Título y URL no pueden estar vacíos.");
+                return;
+            }
+
+            var result = browser.Visit(title, url);
+            Console.WriteLine(result.message);
+            Console.WriteLine($" Tiempo (ticks): {result.elapsedTicks}");
+        }
+
+        private static void HandleTimedAction(string actionName, Func<(long elapsedTicks, string message)> action)
+        {
+            var result = action();
+            Console.WriteLine($"== Acción: {actionName} ==");
+            Console.WriteLine(result.message);
+            Console.WriteLine($" Tiempo (ticks): {result.elapsedTicks}");
+        }
+
+        private static void HandleReport(Browser browser)
+        {
+            var result = browser.Report();
+            Console.WriteLine(result.report);
+            Console.WriteLine($" Tiempo (ticks): {result.elapsedTicks}");
+        }
+    }
+}
