@@ -1,0 +1,89 @@
+using System;
+using System.Collections.Generic;
+
+namespace TorneoFutbolUEA
+{
+    class Program
+    {
+        // Conjunto para evitar equipos duplicados (HashSet)
+        static HashSet<string> equipos = new HashSet<string>();
+
+        // Mapa para registro de jugadores por ID (Dictionary)
+        // La clave es la cédula (string) y el valor es el nombre (string)
+        static Dictionary<string, string> jugadores = new Dictionary<string, string>();
+
+        static void Main(string[] args)
+        {
+            int opcion = 0;
+            while (opcion != 4)
+            {
+                Console.WriteLine("\n--- SISTEMA DE TORNEO DE ");
+                Console.WriteLine("1. Registrar Equipo");
+                Console.WriteLine("2. Registrar Jugador");
+                Console.WriteLine("3. Ver Reportería ");
+                Console.WriteLine("4. Salir");
+                Console.Write("Seleccione una opción: ");
+                
+                if (int.TryParse(Console.ReadLine(), out opcion))
+                {
+                    switch (opcion)
+                    {
+                        case 1: RegistrarEquipo(); break;
+                        case 2: RegistrarJugador(); break;
+                        case 3: MostrarReporteria(); break;
+                        case 4: Console.WriteLine("Saliendo..."); break;
+                        default: Console.WriteLine("Opción no válida."); break;
+                    }
+                }
+            }
+        }
+
+        static void RegistrarEquipo()
+        {
+            Console.Write("Ingrese el nombre del equipo: ");
+            string nombre = Console.ReadLine().ToUpper().Trim();
+            if (equipos.Add(nombre)) // Add devuelve false si ya existe
+            {
+                Console.WriteLine(" Equipo registrado con éxito.");
+            }
+            else
+            {
+                Console.WriteLine(" El equipo ya existe en el conjunto.");
+            }
+        }
+
+        static void RegistrarJugador()
+        {
+            Console.Write("Ingrese cédula del jugador : ");
+            string cedula = Console.ReadLine();
+            Console.Write("Ingrese nombre completo: ");
+            string nombre = Console.ReadLine();
+
+            if (!jugadores.ContainsKey(cedula))
+            {
+                jugadores.Add(cedula, nombre);
+                Console.WriteLine("Jugador registrado en el mapa.");
+            }
+            else
+            {
+                Console.WriteLine(">> Error: Esta cédula ya está registrada.");
+            }
+        }
+
+        static void MostrarReporteria()
+        {
+            Console.WriteLine("\n--- REPORTE GENERAL ---");
+            Console.WriteLine("EQUIPOS INSCRITOS:");
+            foreach (var equipo in equipos)
+            {
+                Console.WriteLine("- " + equipo);
+            }
+
+            Console.WriteLine("\nJUGADORES REGISTRADOS:");
+            foreach (KeyValuePair<string, string> entry in jugadores)
+            {
+                Console.WriteLine($"ID: {entry.Key} | Nombre: {entry.Value}");
+            }
+        }
+    }
+}
